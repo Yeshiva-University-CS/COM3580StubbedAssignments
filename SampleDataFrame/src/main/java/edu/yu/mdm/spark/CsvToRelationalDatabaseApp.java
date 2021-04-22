@@ -13,7 +13,6 @@ import org.apache.spark.sql.SparkSession;
 /**
  * CSV to a relational database.
  * 
- * @author jgp
  */
 public class CsvToRelationalDatabaseApp {
 
