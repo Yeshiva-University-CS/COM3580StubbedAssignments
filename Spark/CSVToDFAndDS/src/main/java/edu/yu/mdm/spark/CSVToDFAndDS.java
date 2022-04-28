@@ -5,6 +5,8 @@ import java.util.Date;
 
 public class CSVToDFAndDS implements Serializable {
 
+    /** Students may not modify the Book class in any way!
+     */
   public static class Book {
     int id;
     int authorId;
@@ -85,6 +87,14 @@ public class CSVToDFAndDS implements Serializable {
 
 
   private static final long serialVersionUID = -1L;
+
+    /** Per the requirements doc, clients will supply a filename to
+     * main() in a command-line invocation.  The file name is a valid
+     * path to the csv file described in the requirements doc.
+     * Students may not change this behavior.  They are encouraged to
+     * supply additional code so that main will implement the function
+     * specified in the requirements doc.
+     */
 
   public static void main(String[] args) {
     if (args.length != 1) {
