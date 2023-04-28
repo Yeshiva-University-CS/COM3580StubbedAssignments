@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>edu.yu.da</groupId>
+  <groupId>edu.yu.mdm</groupId>
   <version>1</version>
   <artifactId>RedisCache</artifactId>
 
@@ -51,33 +51,6 @@
           </properties>
         </configuration>
 
-      </plugin>
-
-      <!-- Invoke main class as: "mvn exec:java" -->
-      <plugin>
-
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <executable>maven</executable>
-          <!-- optional -->
-          <workingDirectory>/tmp</workingDirectory>
-          <arguments>
-          </arguments>
-
-          <mainClass>
-            edu.yu.da.SimpleEquation
-          </mainClass>
-
-        </configuration>
       </plugin>
 
     </plugins>
