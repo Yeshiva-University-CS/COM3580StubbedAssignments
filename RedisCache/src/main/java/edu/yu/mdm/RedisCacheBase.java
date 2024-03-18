@@ -14,6 +14,7 @@ package edu.yu.mdm;
  * @author Avraham Leff
  */
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 import redis.clients.jedis.Jedis;
 
@@ -24,7 +25,8 @@ public abstract class RedisCacheBase {
    *
    * Users are removed in oldest-to-most-recent order of time that the user
    * accessed the RedisCache.  Deleting a user implies that all state
-   * associated with this user is also deleted.
+   * associated with this user is also deleted (including cookies and shopping
+   * carts).
    *
    * Your implementation is allowed to ignore the race condition potentially
    * caused by concurrent method invocation that adds state to the cache (and
@@ -40,8 +42,8 @@ public abstract class RedisCacheBase {
      * one instance.  No instances of user state are removed if the currently
      * cached instances are less than are equal to the specified limit.
      *
-     * @param limit Only a limit number of instances of user state remain after
-     * the method completes, must be non-negative.
+     * @param limit A maximum of "limit" number of instances of user state
+     * remain after the method completes, must be non-negative.
      */
     public CleanerThreadBase(final int limit) {
       if (limit < 0) {
@@ -92,35 +94,61 @@ public abstract class RedisCacheBase {
    * MAX_ITEMS_CACHED_PER_USER: older state is discarded.
    *
    * @param cookie represents the user on the server, may not be empty or null
-   * @param user the user represented by the cookie, may not be empty or null
+   * @param user the user represented by the cookie, may not be empty or null,
+   * and must equal the user currently associated with the cookie (if any).
    * @param item the user has viewed the specified item, can be set by the
    * client to null (in which case, no association between user and item is
    * created)
-   *
+   * @throws IllegalArgumentException if the parameter pre-conditions aren't satisfied.
    */
   abstract public void
     updateCookie(String cookie, String user, String item);
 
-  /** Returns a non-null array containing the items associated with the user
-   * associated with the specified cookie.  The items must be ordered in
-   * ascending order of the time that the client invoked updateCookie().
+  /** Returns a non-null array containing the "viewed items" associated with
+   * the user associated with the specified cookie.  The items must be ordered
+   * in ascending order of the time that the client invoked updateCookie().
    *
    * @param cookie may or not be associated with a user
    * @return An array of items associated with the user associated with the
    * cookie if such an association currently exists, returns an empty array.
+   * @see updateCookie
    */
   abstract public String[] getItems(String cookie);
 
   /** Returns a non-null array containing the cookies currently cached by the
    * system.  The cookies must be ordered in ascending order of the time that the
-   * client last accessed the system.
+   * client invoked updateCookie().
    *
    * @return An array of cookies, empty if no cookies are currently cached by the
    * system.
    */
   abstract public String[] getCookies();
 
-  
+
+  /** Modifies the user's cart to either add to or remove an item from the
+   * cart.
+   *
+   * @param cookie represents the user on the server (i.e., all user state,
+   * including the user's cart), may not be empty or null.
+   * @param item represents the item being being added to the cart, may not
+   * empty or null.
+   * @param quantity if a positive value, specifies the number of items in the
+   *  cart (and replaces any previous quantity associated with the item); if
+   *  not a positive value, specifies that the item be removed from the cart.
+   * @throws IllegalArgumentException if the parameter pre-conditions aren't
+   * met.
+   */
+  abstract public void modifyCart(String cookie, String item, int quantity);
+
+  /** Returns the user's cart if one exists on the server.
+   *
+   * @param cookie represents the user on the server.
+   * @return a Map whose keys are the items in the cart and whose values are
+   * the quantities of that item in the cart.  If the user isn't currently
+   * associated with a cart or if the cookie isn't currently associated with
+   * the user, returns Collections.emptyMap.
+   */
+  abstract public Map<String, Integer> getCart(String cookie);
 
 
   // explicit protected access so subclass implementation can use
