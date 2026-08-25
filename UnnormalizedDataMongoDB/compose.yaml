@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mdm-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      # Not using a named volume: so stopping or removing the container implies
+      # that the corrupted data is gone.
+      - ./seed_data:/seed_data:z 
+    environment:
+      - MONGO_INITDB_DATABASE=shop_db
